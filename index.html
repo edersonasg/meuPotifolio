@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Funcionários</title>
+    <!-- Incluindo o CSS do Bootstrap -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Incluindo o CSS personalizado -->
+    <style>
+        body {
+            padding-top: 20px;
+        }
+
+        .container {
+            margin-top: 30px;
+        }
+
+        .error {
+            color: red;
+        }
+
+        footer {
+            background-color: #f8f9fa;
+            padding: 10px;
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Cadastro de Funcionários</h1>
+        <form id="formFuncionario">
+            <div class="form-group">
+                <label for="nome">Nome</label>
+                <input type="text" class="form-control" id="nome" placeholder="Digite o nome" required>
+            </div>
+            <div class="form-group">
+                <label for="idade">Idade</label>
+                <input type="number" class="form-control" id="idade" placeholder="Digite a idade" required>
+            </div>
+            <div class="form-group">
+                <label for="cargo">Cargo</label>
+                <input type="text" class="form-control" id="cargo" placeholder="Digite o cargo" required>
+            </div>
+            <div class="form-group">
+                <label for="departamento">Departamento (para Gerente)</label>
+                <input type="text" class="form-control" id="departamento" placeholder="Digite o departamento">
+            </div>
+            <div class="form-group">
+                <label for="linguagem">Linguagem de Programação (para Desenvolvedor)</label>
+                <input type="text" class="form-control" id="linguagem" placeholder="Digite a linguagem">
+            </div>
+            <button type="submit" class="btn btn-primary">Adicionar Funcionário</button>
+        </form>
+        <div id="resultado" class="mt-4"></div>
+        <div id="error" class="error"></div>
+    </div>
+
+    <!-- Incluindo o JS do Bootstrap e dependências -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Script JavaScript -->
+    <script>
+        // Definindo as classes
+        class Funcionario {
+            constructor(nome, idade, cargo) {
+                this.nome = nome;
+                this.idade = idade;
+                this.cargo = cargo;
+            }
+
+            seApresentar() {
+                return `Olá, meu nome é ${this.nome}, tenho ${this.idade} anos e sou ${this.cargo}.`;
+            }
+
+            trabalhar() {
+                return `${this.nome} está trabalhando como ${this.cargo}.`;
+            }
+        }
+
+        class Gerente extends Funcionario {
+            constructor(nome, idade, cargo, departamento) {
+                super(nome, idade, cargo);
+                this.departamento = departamento;
+            }
+
+            gerenciar() {
+                return `${this.nome} está gerenciando o departamento ${this.departamento}.`;
+            }
+        }
+
+        class Desenvolvedor extends Funcionario {
+            constructor(nome, idade, cargo, linguagem) {
+                super(nome, idade, cargo);
+                this.linguagem = linguagem;
+            }
+
+            programar() {
+                return `${this.nome} está programando em ${this.linguagem}.`;
+            }
+        }
+
+        // Função para exibir erros
+        function exibirErro(mensagem) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = mensagem;
+        }
+
+        // Função para exibir o resultado
+        function exibirResultado(funcionario) {
+            const resultadoDiv = document.getElementById('resultado');
+            resultadoDiv.innerHTML = `
+                <h2>Informações do Funcionário:</h2>
+                <p>${funcionario.seApresentar()}</p>
+                <p>${funcionario.trabalhar()}</p>
+                ${funcionario instanceof Gerente ? `<p>${funcionario.gerenciar()}</p>` : ''}
+                ${funcionario instanceof Desenvolvedor ? `<p>${funcionario.programar()}</p>` : ''}
+            `;
+        }
+
+        // Função para tratar o envio do formulário
+        document.getElementById('formFuncionario').addEventListener('submit', function (event) {
+            event.preventDefault();
+            try {
+                const nome = document.getElementById('nome').value;
+                const idade = parseInt(document.getElementById('idade').value);
+                const cargo = document.getElementById('cargo').value;
+                const departamento = document.getElementById('departamento').value;
+                const linguagem = document.getElementById('linguagem').value;
+
+                if (!nome || isNaN(idade) || !cargo) {
+                    throw new Error("Todos os campos obrigatórios devem ser preenchidos.");
+                }
+
+                let funcionario;
+                if (departamento) {
+                    funcionario = new Gerente(nome, idade, cargo, departamento);
+                } else if (linguagem) {
+                    funcionario = new Desenvolvedor(nome, idade, cargo, linguagem);
+                } else {
+                    funcionario = new Funcionario(nome, idade, cargo);
+                }
+
+                exibirResultado(funcionario);
+                document.getElementById('error').textContent = ''; // Limpar mensagens de erro
+
+            } catch (error) {
+                exibirErro(error.message);
+            }
+        });
+    </script>
+    <!-- Rodapé -->
+    <footer>
+        <p>&copy; 2024 Meu Site. Todos os direitos reservados.</p>
+    </footer>
+</body>
+
+</html>
